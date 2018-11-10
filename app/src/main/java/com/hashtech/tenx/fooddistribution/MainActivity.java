@@ -60,13 +60,16 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
     DocumentReference userDoc;
     CollectionReference collRef ;
+    CollectionReference postRef ;
+
+    private Map<String, String> list;
 
 
 
     @Override
     protected void onStart() {
         super.onStart();
-         currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
         if(currentUser == null){
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
@@ -75,17 +78,17 @@ public class MainActivity extends AppCompatActivity {
             userDoc = db.collection("users").document(currentUser.getEmail());
         }
 
-        collRef = db.collection("users");
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        db = FirebaseFirestore.getInstance();
+        collRef = db.collection("users");
         mAuth = FirebaseAuth.getInstance();
-
+        list = new HashMap<>();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -95,11 +98,32 @@ public class MainActivity extends AppCompatActivity {
         btnLogut = findViewById(R.id.btn_signout);
 
         tvheader = findViewById(R.id.tv_header);
-        db = FirebaseFirestore.getInstance();
 
-        collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        postRef = db.collection("posts");
+        postRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                    List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                    List<CustomDataType> list = new ArrayList<>();
+                    for(DocumentSnapshot s : docs){
+                        String name = s.getString("name");
+                        String addr = s.getString("address");
+                        String contact = s.getString("contact");
+                        String days = s.getString("days");
+                        String details = s.getString("details");
+                        String time = s.getString("time");
+                        String timestamp = s.getString("timestamp");
+                        String email = s.getString("email");
+                        String id = s.getId();
+
+
+                        CustomDataType data = new CustomDataType(name, email, contact, addr, days, time, details, timestamp, id);
+                        list.add(data);
+                    }
+                    adapter = new RecyclerViewAdapter( list,MainActivity.this);
+                    recyclerView.setAdapter(adapter);
+
+
 
             }
         });
@@ -120,18 +144,6 @@ public class MainActivity extends AppCompatActivity {
                 sellDialog(MainActivity.this);
             }
         });
-
-
-
-
-        /*for(int i=0;i<10;i++){
-            CustomDataType sampledata = new CustomDataType("supplier"+i,0000+i,"Address"+i,"monday"+i, i,i);
-            listItems.add(sampledata);
-        }
-
-        adapter = new RecyclerViewAdapter(listItems,this);
-        recyclerView.setAdapter(adapter);
-        */
 
 
 
@@ -162,18 +174,20 @@ public class MainActivity extends AppCompatActivity {
                 String details = etdetails.getText().toString();
                 String time = etTime.getText().toString();
                 String days = etDays.getText().toString();
-                Map<String, String> data = new HashMap<>();
+                final Map<String, String> data = new HashMap<>();
                 data.put("name", name);
+                data.put("email", currentUser.getEmail());
                 data.put("address", address);
                 data.put("contact", contact);
                 data.put("details", details);
                 data.put("time", time);
                 data.put("days", days);
                 data.put("timestamp", ""+System.currentTimeMillis());
-                userDoc.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                postRef.document().set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(MainActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
