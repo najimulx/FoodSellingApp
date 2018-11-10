@@ -5,6 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -13,6 +16,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,16 +33,58 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.Adapter adapter;
     private List<CustomDataType> listItems;
 
+    public static String username = "";
+    private FirebaseAuth mAuth;
+    Button btnLogut;
+    TextView tvheader;
+    FirebaseUser currentUser;
+
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+         currentUser = mAuth.getCurrentUser();
+        if(currentUser == null){
+            Intent i = new Intent(MainActivity.this, LogInActivity.class);
+            startActivity(i);
+        }
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkLogInStatus();
+
+
+        mAuth = FirebaseAuth.getInstance();
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         listItems = new ArrayList<>();
+
+        username = getIntent().getStringExtra("username");
+        btnLogut = findViewById(R.id.btn_signout);
+
+        tvheader = findViewById(R.id.tv_header);
+        tvheader.setText(username);
+
+
+        btnLogut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+                currentUser = null;
+                Intent i = new Intent(MainActivity.this, LogInActivity.class);
+                startActivity(i);
+            }
+        });
+
+
 
 
         /*for(int i=0;i<10;i++){
@@ -48,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new RecyclerViewAdapter(listItems,this);
         recyclerView.setAdapter(adapter);
         */
-        loadData();
+
 
 
     }

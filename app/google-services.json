@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "35112895764",
+    "firebase_url": "https://project-guist.firebaseio.com",
+    "project_id": "project-guist",
+    "storage_bucket": "project-guist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35112895764:android:0354355e7d5b8d26",
+        "android_client_info": {
+          "package_name": "com.hashtech.tenx.fooddistribution"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35112895764-qler7vlbrhct70h4c6ls8b6demlrhah0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe2IkREnVJUZOQES3bhBlGinlBq5kUfZM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
