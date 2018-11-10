@@ -9,18 +9,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
 
-    private List<CustomDataType> listitem;
+    private List<CustomDataType> list;
     private Context context;
 
-    public RecyclerViewAdapter(List<CustomDataType> listitem, Context context) {
-        this.listitem = listitem;
+    public RecyclerViewAdapter(Context context) {
+        this.context = context;
+        list = new ArrayList<>();
+    }
+
+
+    public RecyclerViewAdapter(List<CustomDataType> list, Context context) {
+        this.list = list;
         this.context = context;
     }
 
@@ -35,29 +41,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CustomDataType customDataType = listitem.get(position);
-        holder.nameTextView.setText(customDataType.getNameOfSupplier());
-        holder.phoneTextView.setText(Integer.toString(customDataType.getPhone()));
-        holder.addressTextView.setText(customDataType.getAddress());
-        holder.dayTextView.setText(customDataType.getDay());
-        holder.timeTextView.setText(Integer.toString(customDataType.getTime()));
-        holder.surplusTextView.setText(Integer.toString(customDataType.getSurplus()));
-
-        holder.requestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                ////////////////////////////////////////////////////////////////////////////////
-
-            }
-        });
+        CustomDataType data = list.get(position);
+        holder.nameTextView.setText(data.getNameOfSupplier());
+        holder.addressTextView.setText(data.getAddress());
+        holder.phoneTextView.setText(data.getPhone());
+        holder.dayTextView.setText(data.getDay());
+        holder.timeTextView.setText(data.getTime());
 
     }
 
     @Override
     public int getItemCount() {
-        return listitem.size();
+        return list.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -79,8 +74,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         }
     }
-
-
-
-
+    public void insertAndRefresh(CustomDataType data){
+        if(list == null){
+            list = new ArrayList<>();
+            list.add(data);
+            notifyDataSetChanged();
+        }else {
+            list.add(data);
+            notifyDataSetChanged();
+        }
+    }
 }
