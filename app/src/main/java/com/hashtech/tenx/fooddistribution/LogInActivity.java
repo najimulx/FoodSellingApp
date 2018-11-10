@@ -97,10 +97,11 @@ public class LogInActivity extends AppCompatActivity {
                                 data.put("username", name);
                                 data.put("email", email);
 
-                                db.collection("users").add(data).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                db.collection("users").document(email).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                                        Toast.makeText(context, "New user created", Toast.LENGTH_SHORT).show();
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                        Toast.makeText(context, "New User Created!", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
                                     }
                                 });
@@ -134,20 +135,7 @@ public class LogInActivity extends AppCompatActivity {
            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                @Override
                public void onComplete(@NonNull Task<AuthResult> task) {
-                   db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                       @Override
-                       public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                           if(task.isSuccessful()){
-                               List<DocumentSnapshot> docs = task.getResult().getDocuments();
-                               for(DocumentSnapshot s : docs){
-                                   if(s.getString("email").equals(email)){
-                                       goNextActivity(s.getString("username"));
-                                   }
-                               }
-
-                           }
-                       }
-                   });
+                   goNextActivity();
                }
            }).addOnFailureListener(new OnFailureListener() {
                @Override
@@ -162,9 +150,8 @@ public class LogInActivity extends AppCompatActivity {
 
     }
 
-    public void goNextActivity(String name){
+    public void goNextActivity(){
             Intent i = new Intent(LogInActivity.this, MainActivity.class);
-            i.putExtra("username",name );
             startActivity(i);
             finish();
     }

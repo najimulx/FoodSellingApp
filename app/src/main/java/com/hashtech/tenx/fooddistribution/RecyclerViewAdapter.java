@@ -36,21 +36,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CustomDataType customDataType = listitem.get(position);
-        holder.nameTextView.setText(customDataType.getNameOfSupplier());
-        holder.phoneTextView.setText(Integer.toString(customDataType.getPhone()));
-        holder.addressTextView.setText(customDataType.getAddress());
-        holder.dayTextView.setText(customDataType.getDay());
-        holder.timeTextView.setText(Integer.toString(customDataType.getTime()));
-        holder.surplusTextView.setText(Integer.toString(customDataType.getSurplus()));
 
-        holder.requestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-
-            }
-        });
 
     }
 

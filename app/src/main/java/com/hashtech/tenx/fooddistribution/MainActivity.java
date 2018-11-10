@@ -1,12 +1,17 @@
 package com.hashtech.tenx.fooddistribution;
 
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,15 +21,29 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,10 +54,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static String username = "";
     private FirebaseAuth mAuth;
-    Button btnLogut;
+    Button btnLogut,btnSell;
     TextView tvheader;
     FirebaseUser currentUser;
-
+    FirebaseFirestore db;
+    DocumentReference userDoc;
+    CollectionReference collRef ;
 
 
 
@@ -49,9 +70,12 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser == null){
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
+        }else {
+            tvheader.setText(currentUser.getEmail());
+            userDoc = db.collection("users").document(currentUser.getEmail());
         }
 
-
+        collRef = db.collection("users");
     }
 
     @Override
@@ -71,8 +95,14 @@ public class MainActivity extends AppCompatActivity {
         btnLogut = findViewById(R.id.btn_signout);
 
         tvheader = findViewById(R.id.tv_header);
-        tvheader.setText(username);
+        db = FirebaseFirestore.getInstance();
 
+        collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+            }
+        });
 
         btnLogut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
                 currentUser = null;
                 Intent i = new Intent(MainActivity.this, LogInActivity.class);
                 startActivity(i);
+            }
+        });
+        btnSell = findViewById(R.id.btn_sell);
+        btnSell.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sellDialog(MainActivity.this);
             }
         });
 
@@ -100,7 +137,61 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void loadData() {
+    public void sellDialog(Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View  v = LayoutInflater.from(context).inflate(R.layout.dialog_seller, null, false);
+        builder.setView(v);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        final EditText etname, etaddress, etcontact, etdetails, etTime, etDays;
+        Button btnPost;
+        etaddress = v.findViewById(R.id.et_s_address);
+        etname = v.findViewById(R.id.et_s_name);
+        etcontact = v.findViewById(R.id.et_s_contact);
+        etdetails = v.findViewById(R.id.et_s_details);
+        etTime = v.findViewById(R.id.et_s_time);
+        etDays = v.findViewById(R.id.et_s_days);
+        btnPost = v.findViewById(R.id.btn_post);
+
+        btnPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = etname.getText().toString();
+                String address = etaddress.getText().toString();
+                String contact = etcontact.getText().toString();
+                String details = etdetails.getText().toString();
+                String time = etTime.getText().toString();
+                String days = etDays.getText().toString();
+                Map<String, String> data = new HashMap<>();
+                data.put("name", name);
+                data.put("address", address);
+                data.put("contact", contact);
+                data.put("details", details);
+                data.put("time", time);
+                data.put("days", days);
+                data.put("timestamp", ""+System.currentTimeMillis());
+                userDoc.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MainActivity.this, "Failed, Try again!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+    }
+
+    /*private void loadData() {
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, JSON_URL,
@@ -150,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+*/
 
 
 }

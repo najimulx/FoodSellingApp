@@ -3,13 +3,13 @@ package com.hashtech.tenx.fooddistribution;
 public class CustomDataType {
 
     private String nameOfSupplier;
-    private int phone;
+    private String phone;
     private String address;
     private String day;
-    private int time;
-    private int surplus;
+    private Long time;
+    private String surplus;
 
-    public CustomDataType(String nameOfSupplier, int phone, String address, String day, int time, int surplus) {
+    public CustomDataType(String nameOfSupplier, String phone, String address, String day, Long time, String surplus) {
         this.nameOfSupplier = nameOfSupplier;
         this.phone = phone;
         this.address = address;
@@ -22,7 +22,7 @@ public class CustomDataType {
         return nameOfSupplier;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
@@ -34,11 +34,11 @@ public class CustomDataType {
         return day;
     }
 
-    public int getTime() {
+    public Long getTime() {
         return time;
     }
 
-    public int getSurplus() {
+    public String getSurplus() {
         return surplus;
     }
 }
