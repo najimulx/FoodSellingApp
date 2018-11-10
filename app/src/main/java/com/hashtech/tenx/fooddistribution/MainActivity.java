@@ -3,12 +3,19 @@ package com.hashtech.tenx.fooddistribution;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,7 +52,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     public static final String JSON_URL = "url";///////////////////////////////////////////////////////////////////////////////
     private RecyclerView recyclerView;
@@ -63,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     CollectionReference postRef ;
 
     private Map<String, String> list;
+    DrawerLayout drawer;
 
 
 
@@ -84,10 +92,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.navigation_activity);
         db = FirebaseFirestore.getInstance();
         collRef = db.collection("users");
         mAuth = FirebaseAuth.getInstance();
+
+        //nav
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_nav);
+
+        drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
+
+
+
         list = new HashMap<>();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -204,58 +230,31 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-    /*private void loadData() {
-
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, JSON_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray array = jsonObject.getJSONArray("supplier");
-                            for(int j = 0;j<array.length();j++){
-                                JSONObject o = array.getJSONObject(j);
-                                CustomDataType data = new CustomDataType(
-                                        o.getString("name"),
-                                        o.getInt("phone"),
-                                        o.getString("address"),
-                                        o.getString("day"),
-                                        o.getInt("time"),
-                                        o.getInt("surplus")
-                                );
-                                listItems.add(data);
-                            }
-                            adapter = new RecyclerViewAdapter(listItems,getApplicationContext());
-                            recyclerView.setAdapter(adapter);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home, menu);
+        return true;
     }
 
-
-    public void switchToLogIn(){
-        Intent intentToLogIn = new Intent(getApplicationContext(),LogInActivity.class);
-        startActivity(intentToLogIn);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                drawer.openDrawer(GravityCompat.START);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
-    public void checkLogInStatus(){
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_share:
+                Toast.makeText(this, "Sharing", Toast.LENGTH_SHORT).show();
+        }
+        drawer.closeDrawer(GravityCompat.START);
 
-
+        return true;
     }
-*/
-
-
 }
